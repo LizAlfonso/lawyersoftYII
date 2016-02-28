@@ -17,9 +17,9 @@ use yii\helpers\Security;
  * @property string $password_reset_token
  * @property string $email
  * @property string $auth_key
- * @property integer $id_rol
- * @property integer $id_estado
- * @property integer $id_tipo_usuario
+ * @property integer $rol_id
+ * @property integer $estado_id
+ * @property integer $tipo_usuario_id
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
@@ -56,9 +56,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['id_estado', 'default', 'value' => self::ESTADO_ACTIVO],
-            ['id_rol', 'default', 'value' => 1],
-            ['id_tipo_usuario', 'default', 'value' => 1],
+            ['estado_id', 'default', 'value' => self::ESTADO_ACTIVO],
+            ['rol_id', 'default', 'value' => 1],
+            ['tipo_usuario_id', 'default', 'value' => 1],
             ['username', 'filter', 'filter' => 'trim'],
             ['username', 'required'],
             ['username', 'unique'],
@@ -83,7 +83,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne(['id' => $id, 'id_estado' => self::ESTADO_ACTIVO]);
+        return static::findOne(['id' => $id, 'estado_id' => self::ESTADO_ACTIVO]);
     }
 
     /**
@@ -101,7 +101,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'id_estado' => self::ESTADO_ACTIVO]);
+        return static::findOne(['username' => $username, 'estado_id' => self::ESTADO_ACTIVO]);
     }
 
     /**
@@ -117,7 +117,7 @@ class User extends ActiveRecord implements IdentityInterface
         }
         return static::findOne([
             'password_reset_token' => $token,
-            'id_estado' => self::ESTADO_ACTIVO,
+            'estado_id' => self::ESTADO_ACTIVO,
         ]);
     }
 
@@ -206,5 +206,13 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * Cada usuario crear un único perfil 
+     */
+    public function getPerfil()
+    {
+        return $this->hasOne(Perfil::className(), ['user_id' => 'id']);
     }
 } 
